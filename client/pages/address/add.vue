@@ -50,7 +50,7 @@
                   <div class="a-spacing-top-medium">
                     <label style="margin-bottom: 0px;">Country/Region</label>
                     <select class="a-select-option"
-                    v-model="country"
+                    :v-model="country"
                     >
                       <option
                       v-for="country in countries"
@@ -177,7 +177,7 @@ export default {
   data() {
     return {
       // fullName: '',
-      country: 'IQ',
+      country: 'Iraq',
       mobile: '',
       pinCode: '',
       houseNumber: '',

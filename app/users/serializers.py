@@ -14,7 +14,7 @@ class UserSerializer(serializers.ModelSerializer):
     #     many=True,
     #     queryset=Address.objects.all()
     # )
-    address = AddressSerializer(many=True)
+    address = AddressSerializer(read_only=True, many=True)
     class Meta:
         model = get_user_model()
         fields = ('email', 'password', 'name', 'image', 'address', 'is_supplier')
