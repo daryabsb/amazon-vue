@@ -2,6 +2,7 @@ from rest_framework import generics, authentication, permissions, viewsets, mixi
 
 from rest_framework.authentication import TokenAuthentication
 
+from addresses.permissions import IsAddressOwnerOrReadOnly 
 from addresses.serializers import AddressSerializer
 
 from core.models import Address
@@ -13,7 +14,7 @@ class AddressViewset(viewsets.ModelViewSet):
     serializer_class = AddressSerializer
 
     authentication_classes = (TokenAuthentication,)
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAddressOwnerOrReadOnly,)
 
     def perform_create(self, serializer):
         """Create a new object"""

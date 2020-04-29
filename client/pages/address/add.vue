@@ -49,17 +49,27 @@
                   <!-- Country / Region -->
                   <div class="a-spacing-top-medium">
                     <label style="margin-bottom: 0px;">Country/Region</label>
-                    <select class="a-select-option"
-                    :v-model="country"
-                    >
+                    <select class="a-select-option">
                       <option
                       v-for="country in countries"
                       :key="country.code"
+                      :value="country"
                       >{{country.name}}</option>
                       <option></option>
                     </select>
                   </div>
                   <!-- Full name -->
+                  <div class="a-spacing-top-medium">
+                    <label style="margin-bottom: 0px;">Full Name</label>
+                    <input
+                      type="text"
+                      class="a-input-text"
+                      style="width: 100%;"
+                      placeholder="Street and number, P.O. box, c/o."
+                      v-model="fullName"
+                    />
+                  </div>
+                  <!-- House number -->
                   <div class="a-spacing-top-medium">
                     <label style="margin-bottom: 0px;">House Number</label>
                     <input type="text" class="a-input-text" style="width: 100%;" v-model="houseNumber" />
@@ -163,7 +173,7 @@ export default {
   async asyncData({$axios}) {
     try {
       let response = await $axios.$get(
-        `https://restcountries.eu/rest/v2/all`
+        'https://restcountries.eu/rest/v2/all/'
       );
     //  console.log(this.country.value)
       return {
@@ -176,8 +186,8 @@ export default {
   },
   data() {
     return {
-      // fullName: '',
-      country: 'Iraq',
+      fullName: '',
+      country: 'IQ',
       mobile: '',
       pinCode: '',
       houseNumber: '',
@@ -193,7 +203,7 @@ export default {
     async onAddAddress() {
       try {
         let data = {
-          // fullname: this.fullName,
+          fullname: this.fullName,
           country: this.country,
           mobile: this.mobile,
           pincode: this.pinCode,
@@ -211,7 +221,7 @@ export default {
         )
         
         if (response) {
-          this.$router.push('/')
+          this.$router.push('/address')
         }
       } catch (err) {
         console.log(err)
