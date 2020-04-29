@@ -84,7 +84,7 @@
                         <a href="/address">Edit</a>
                         &nbsp; | &nbsp;
                         <a
-                          href="#"
+                          href="/address"
                           @click="onDeleteAddresses(address.id, index)"
                         >Delete</a>
                         &nbsp; | &nbsp;
@@ -123,18 +123,36 @@ export default {
     }
   },
   methods: {
+    // async onDeleteAddresses(id, index) {
+    //   try {
+    //     let response = await this.$axios.$delete(
+    //       `${baseApi}/address/addresses/${id}`
+    //     )
+    //       this.message = 'You have just deleted an address from the list!'
+    //       this.addresses.splice(index, 1);
+    //       await this.$auth.fetchUser();
+    //   } catch (err) {
+    //     consloe.log(err)
+    //   }
+    // },
     async onDeleteAddresses(id, index) {
-      try {
-        let response = await this.$axios.$delete(
-          `${baseApi}/address/addresses/${id}`
-        )
-          this.message = 'You have just deleted an address from the list!'
-          this.addresses.splice(index, 1)
-          await this.$auth.fetchUser();
-      } catch (err) {
-        consloe.log(err)
-      }
+
+    try {
+      let response = await this.$axios.$delete(
+        `${baseApi}/address/addresses/${id}`
+      )
+
+      if (response.status) {
+        this.message = 'You have just deleted an address from the list!'
+        this.products.splice(index, 1);
+        await this.$auth.fetchUser()
+      } 
+
+    } catch (err) {
+      console.log(err)
     }
+    
+  }
   }
 }
 </script>
