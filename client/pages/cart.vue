@@ -33,10 +33,9 @@
                         <div class="col-sm-8 col-8">
                           <!-- Product's Title -->
                           <div class="a-spacing-mini">
-                            <a
-                              href="#"
+                            <nuxt-link :to="`/products/${product.slug}`"
                               class="a-link-normal a-size-medium a-text-bold"
-                            >{{product.title}}</a>
+                            >{{product.title}}</nuxt-link>
                             <!-- Product's Owner name -->
                             <span class="a-size-base sc-product-creator"
                             >by {{product.user.name}}</span>
