@@ -186,9 +186,6 @@ class Product(models.Model):
     def __str__(self):
         return self.title
 
-class Cart(models.Model):
-    pass
-
 
 
 class Review(models.Model):
@@ -207,17 +204,19 @@ class Review(models.Model):
         return str(self.rating)
 
 class Cart(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+    user = models.ForeignKey(User,
                              on_delete=models.CASCADE)
     ordered = models.BooleanField(default=False)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
+    date_added = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.quantity} of {self.product.title}"
+        return f"{self.quantity} of {self.product}"
 
     def get_total_product_price(self):
-        return self.quantity * self.item.price
+        return self.quantity * self.product.price
 
     def get_total_discount_product_price(self):
         return self.quantity * self.product.discount_price
@@ -238,7 +237,7 @@ class Shipment(models.Model):
         ('normal', 'Normal'),
         ('Collective', 'Collective'),
     ]
-
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     delivery_term = models.CharField(
         max_length=12,
         choices=DELIVERY_OPTIONS,
@@ -247,6 +246,8 @@ class Shipment(models.Model):
     description = models.TextField(null=True, blank=True)
     delivery_days = models.PositiveSmallIntegerField()
     rate=models.FloatField()
+    date_added = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
 
@@ -259,10 +260,10 @@ class Order(models.Model):
     user = models.ForeignKey(User,
                              on_delete=models.CASCADE)
     ref_code = models.CharField(max_length=20, blank=True, null=True)
-    products = models.ManyToManyField(Cart)
+    cart = models.ManyToManyField('Cart')
     date_added = models.DateTimeField(auto_now_add=True)
     date_ordered = models.DateTimeField()
-    ordered = models.BooleanField(default=False)
+    # ordered = models.BooleanField(default=False)
     shipping_address = models.ForeignKey(
         'Address', related_name='shipping_address', on_delete=models.SET_NULL, blank=True, null=True)
     billing_address = models.ForeignKey(
@@ -290,13 +291,13 @@ class Order(models.Model):
     def __str__(self):
         return self.user.username
 
-    def get_total(self):
-        total = 0
-        for order_item in self.items.all():
-            total += order_item.get_final_price()
-        if self.coupon:
-            total -= self.coupon.amount
-        return total
+    # def get_total(self):
+    #     total = 0
+    #     for order_item in self.items.all():
+    #         total += order_item.get_final_price()
+    #     if self.coupon:
+    #         total -= self.coupon.amount
+    #     return total
 
 class Payment(models.Model):
     pass
