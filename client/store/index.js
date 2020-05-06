@@ -1,10 +1,28 @@
 export const state = () => ({
     cart: [],
-    cartLength: 0
+    cartLength: 0,
+    cartApi: []
 })
 
 export const actions = {
+    async nuxtServerInit({ state, commit }) {
+        const allCart = await this.$axios.get(
+            'http://127.0.0.1:8000/api/order/carts/'
+        )
+    //    console.log(allCart.data)
+        // if(state.cartApi){
+        commit("getCartApiFilled", allCart);
+        // } else {
+            // console.log('What the hell!')
+        // }        
+    },
+
+    // nuxtServerInit({state, commit}, {req}) {
+    //     state.cart = []
+    //     console.log(state.cart)
+    //  },
     addProductToCart({ state, commit }, product) {
+        
         const cartProduct = state.cart.find(prod => prod.id === product.id);
 
         if (!cartProduct) {
@@ -18,13 +36,41 @@ export const actions = {
 };
 
 export const mutations = {
-    pushProductToCart(state, product) {
-        product.quantity = 1
-        state.cart.push(product)
+    getCartApiFilled(state, allCart) {
+        
+        // console.log(allCart.data[0].product_id)
+      
+    var i = 0;
+    var cl = 0;
+    for (i in allCart.data) {
+        // console.log(allCart.data[i].quantity)
+        state.cart.push(allCart.data[i])
+        state.cart[i].product_id.quantity = state.cart[i].quantity
+        cl += state.cart[i].quantity
+    }
+    state.cartLength = cl
+    // console.log(state.cart)
+       
+        
+        
+    },
+    
+    async pushProductToCart(state, product) {
+        let data = {
+            "ordered": false,
+            "product": product.id,
+            "quantity": 1
+        };
+            // console.log(data)
+        let productData = await this.$axios.post(
+            'http://127.0.0.1:8000/api/order/carts/', data
+        );
+        // console.log(product)
+        // state.cart.push(product)
     },
 
     incrementProductQty(state, product) {
-        cartProduct.quantity++;
+        product.quantity++;
         let indexOfProduct = state.cart.indexOf(product);
         state.cart.splice(indexOfProduct, 1, product)
     },
@@ -78,11 +124,13 @@ export const getters = {
     },
     getCartTotalPrice(state) {
         let total = 0
-        state.cart.map(product =>{
-            total += product.price * product.quantity;
-
+        // console.log(state.cart[0].product_id)
+        state.cart.map(product_id =>{
+            // console.log(product_id.product_id)
+            total += product_id.product_id.price * product_id.product_id.quantity ;
+        
         });
-
+        
         return total;
     }
 }

@@ -12,24 +12,35 @@ class ShipmentSerializer(serializers.ModelSerializer):
             depth = 2
 
 class CartSerializer(serializers.ModelSerializer):
-    
+  
+    product_id = MyProductSerializer(source='product',read_only=True)
     product = serializers.PrimaryKeyRelatedField(
-        queryset=Product.objects.all()
-    )
-    
+                                      queryset=Product.objects.all(), 
+                                      write_only=True, )
+
     user = UserSerializer(read_only=True)
 
-    # date_added = serializers.SerializerMethodField(read_only=True)
+    total_item_price = serializers.SerializerMethodField()
+
+    date_added = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Cart
-        fields = ('id', 'user', 'ordered', 'product', 'quantity', 
+        fields = ('id', 'user', 'ordered', 'product', 'product_id', 'quantity', 'total_item_price', 
         'date_added')
-         
+        # extra_kwargs = {'product': {'view_only': True}}
         read_only_Fields = ('id',)
+        # depth = 1
 
-        # def get_date_added(self, instance):
-        #     return instance.date_added.strftime("%B %d, %Y")
+    def get_total_item_price(self, obj):
+      return obj.get_total_product_price()
+    
+    def get_product_detail(self,serializer):
+        prod_detail = serializer(read_only=True)
+        return prod_detail
+
+    def get_date_added(self, instance):
+        return instance.date_added.strftime("%B %d, %Y")
     
 
 
@@ -42,7 +53,7 @@ class OrderSerializer(serializers.ModelSerializer):
       queryset=Cart.objects.filter(ordered=False)
     )
 
-    # date_added = serializers.SerializerMethodField(read_only=True)
+    date_added = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Order
@@ -52,5 +63,5 @@ class OrderSerializer(serializers.ModelSerializer):
                   )
         read_only_Fields = ('id',)
 
-        def get_date_added(self, instance):
-            return instance.date_added.strftime("%B %d, %Y")
+    def get_date_added(self, instance):
+        return instance.date_added.strftime("%B %d, %Y")

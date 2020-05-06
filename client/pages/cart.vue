@@ -17,33 +17,33 @@
                   </div>
                 </div>
                 <!-- List of the item -->
-                <div class="sc-list-body"
-                v-for="product in getCart"
-                :key="product.slug"
-                >
+                <div class="sc-list-body" v-for="product in getCart" :key="product.product_id.slug">
                   <div class="sc-list-item-border">
                     <div class="a-row a-spacing-top-base a-spacing-base">
                       <div class="row">
                         <!-- Product's Image -->
                         <div class="col-sm-2 col-2">
                           <a href="#" class="a-link-normal">
-                            <img :src="product.image" class="img-fluid w-100" />
+                            <img :src="product.product_id.image" class="img-fluid w-100" />
                           </a>
                         </div>
                         <div class="col-sm-8 col-8">
+                          <div>
+                  
+                          </div>
                           <!-- Product's Title -->
                           <div class="a-spacing-mini">
-                            <nuxt-link :to="`/products/${product.slug}`"
+                            <nuxt-link
+                              :to="`/products/${product.product_id.slug}`"
                               class="a-link-normal a-size-medium a-text-bold"
-                            >{{product.title}}</nuxt-link>
+                            >{{product.product_id.title}}</nuxt-link>
                             <!-- Product's Owner name -->
-                            <span class="a-size-base sc-product-creator"
-                            >by {{product.user.name}}</span>
+                            <span class="a-size-base sc-product-creator">by {{product.product_id.user.name}}</span>
                           </div>
                           <div>
                             <span
                               class="a-size-small a-color-secondary sc-product-binding"
-                            >{{product.category}}</span>
+                            >{{product.product_id.category}}</span>
                           </div>
                           <div>
                             <span
@@ -64,12 +64,12 @@
                             </label>
                           </div>
                           <div class="sc-action-links">
-                            <select @change="onChangeQuantity($event, product)" >
+                            <select @change="onChangeQuantity($event, product.product_id)">
                               <option
-                              v-for="i in 10"
-                              :key="i"
-                              :value="i"
-                              :selected="checkQty(product.quantity, i)"
+                                v-for="i in 10"
+                                :key="i"
+                                :value="i"
+                                :selected="checkQty(product.quantity, i)"
                               >Qty: &nbsp;{{i}}</option>
                             </select>
                             &nbsp;&nbsp;
@@ -88,7 +88,7 @@
                           <p class="a-spacing-small">
                             <span
                               class="a-size-medium a-color-price sc-price sc-white-space-nowrap sc-product-price sc-price-sign a-text-bold"
-                            >${{product.price * product.quantity}}</span>
+                            >${{parseInt(product.product_id.price) * parseInt(product.quantity)}}</span>
                           </p>
                         </div>
                       </div>
@@ -103,8 +103,7 @@
                     <span class="a-size-medium">Subtotal ({{getCartLength}} item)</span>
                     <span class="a-color-price a-text-bold">
                       <!-- Cart Total Price -->
-                      <span class="a-size-medium a-color-price"
-                      >${{getCartTotalPrice}}</span>
+                      <span class="a-size-medium a-color-price">${{getCartTotalPrice}}</span>
                     </span>
                   </p>
                 </div>
@@ -122,8 +121,7 @@
                         <span>Subtotal ({{getCartLength}} item):</span>
                         <span class="a-color-price a-text-bold">
                           <!-- Cart Total Price  -->
-                          <span class="a-size-medium a-color-price"
-                          >${{getCartTotalPrice}}</span>
+                          <span class="a-size-medium a-color-price">${{getCartTotalPrice}}</span>
                         </span>
                       </span>
                     </p>
@@ -204,25 +202,24 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters } from 'vuex'
 export default {
-  
   computed: {
     ...mapGetters(['getCart', 'getCartTotalPrice', 'getCartLength'])
   },
   methods: {
     onChangeQuantity(event, product) {
-      let qty = parseInt(event.target.value);
-      this.$store.commit('changeQty', { product, qty });
+      let qty = parseInt(event.target.value)
+      this.$store.commit('changeQty', { product, qty })
     },
     checkQty(prodQty, qty) {
-      if(parseInt(prodQty) === parseInt(qty)) {
-        return true;
+      if (parseInt(prodQty) === parseInt(qty)) {
+        return true
       } else {
-        return false;
+        return false
       }
     }
-  },
+  }
 }
 </script>
 

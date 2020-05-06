@@ -55,7 +55,7 @@ class User(PermissionsMixin, AbstractBaseUser):
     email = models.EmailField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
     # address = models.ManyToManyField('Address', null=True)
-    image = models.ImageField(null=True, upload_to=product_image_file_path)
+    image = models.ImageField(null=True, blank=True, upload_to=product_image_file_path)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_supplier = models.BooleanField(default=False)
@@ -207,7 +207,18 @@ class Cart(models.Model):
     user = models.ForeignKey(User,
                              on_delete=models.CASCADE)
     ordered = models.BooleanField(default=False)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(
+                            Product, 
+                            on_delete=models.CASCADE,
+                            related_name='cart'
+                            )
+
+    # product_detail = models.ForeignKey(
+    #                         Product, 
+    #                         on_delete=models.CASCADE,
+    #                         related_name='cart-products'
+    #                         )
+
     quantity = models.IntegerField(default=1)
     date_added = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
