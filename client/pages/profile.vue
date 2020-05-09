@@ -31,16 +31,7 @@
               />
             </div>
             <!-- Address -->
-            <div class="a-spacing-top-medium">
-              <label>Address</label>
-              <textarea
-                type="text"
-                class="a-input-text"
-                style="width: 100%;"
-                
-                :placeholder="Address"
-              />
-            </div>
+            
             <!-- Password -->
             <div class="a-spacing-top-medium">
               <label for="ap_customer-password" class="a-form-label">Password:</label>
@@ -98,7 +89,7 @@ export default {
     return {
       name: this.$auth.user.name,
       email: this.$auth.user.email,
-      address: this.$auth.user.address,
+      // address: this.$auth.user.address,
       password: this.$auth.user.password,
       is_supplier: this.$auth.user.is_supplier
     }

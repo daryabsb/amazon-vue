@@ -224,11 +224,11 @@
                   <div class="row">
                     <div class="col-sm-5 col-5">
                       <select>
-                        <option value="1">Qty: &nbsp; 1</option>
-                        <option value="2">Qty: &nbsp; 2</option>
-                        <option value="3">Qty: &nbsp; 3</option>
-                        <option value="4">Qty: &nbsp; 4</option>
-                        <option value="5">Qty: &nbsp; 5</option>
+                        <option v-for="i in 20"
+                                :key="i"
+                                :value="i"
+                                :selected="i"
+                              >Qty: &nbsp;{{i}}</option>
                       </select>
                     </div>
                   </div>
@@ -247,7 +247,7 @@
                 </div>
 
                 <div class="a-section">
-                  <div class="a-button-stack" @click="addProductToCart(product)" >
+                  <div class="a-button-stack" @click="addProductToCart(product.id, i)" >
                     <span class="a-spacing-small a-button-primary a-button-icon">
                       <span class="a-button-inner">
                         <i class="a-icon a-icon-cart"></i>
@@ -361,6 +361,11 @@ export default {
   components: {
     ReviewSection
   },
+  data() {
+    return {
+      i:1
+    }
+  },
   async asyncData({ $axios, params }) {
     try {
       let singleProduct = $axios.$get(`${base}/product/products/${params.id}`)
@@ -380,6 +385,18 @@ export default {
     }
   },
   methods: {
+    onChangeQuantity(event, product) {
+      let qty = parseInt(event.target.value)
+      this.$store.commit('changeQty', { product, qty })
+    },
+    checkQty(prodQty, qty) {
+      if (parseInt(prodQty) === parseInt(qty)) {
+        return true
+      } else {
+        return false
+      }
+    },
+  
     ...mapActions(['addProductToCart'])
   }
 }

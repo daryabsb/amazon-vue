@@ -32,10 +32,13 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 class MyProductSerializer(serializers.ModelSerializer):
     # Serialize a recipe
-    
+    # category = CategorySerializer()
     tags = serializers.PrimaryKeyRelatedField(
         many=True,
         queryset=Tag.objects.all()
+    )
+    category = serializers.PrimaryKeyRelatedField(
+       queryset=Category.objects.all()
     )
 
     reviews_count = serializers.SerializerMethodField()
@@ -48,10 +51,10 @@ class MyProductSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Product
-        fields = ('id', 'title', 'description', 'category', 'tags', 'stock',
+        fields = ('id', 'title', 'description', 'category', 'tags', 'featured', 'stock',
                   'price', 'slug', 'user', 'image', 'reviews_count'
                   )
-        read_only_Fields = ('id',)
+        read_only_Fields = ('id', 'user')
 
     def get_reviews_count(self, instance):
         return instance.reviews.count()

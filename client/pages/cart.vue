@@ -17,14 +17,15 @@
                   </div>
                 </div>
                 <!-- List of the item -->
-                <div class="sc-list-body" v-for="product in getCart" :key="product.product_id.slug">
-                  <div class="sc-list-item-border">
+                <div class="sc-list-body" v-for="product in getCart" :key="product.id">
+                  <div class="sc-list-item-border"
+                  v-if="!product.ordered">
                     <div class="a-row a-spacing-top-base a-spacing-base">
                       <div class="row">
                         <!-- Product's Image -->
                         <div class="col-sm-2 col-2">
                           <a href="#" class="a-link-normal">
-                            <img :src="product.product_id.image" class="img-fluid w-100" />
+                            <img :src="product.image" class="img-fluid w-100" />
                           </a>
                         </div>
                         <div class="col-sm-8 col-8">
@@ -34,21 +35,26 @@
                           <!-- Product's Title -->
                           <div class="a-spacing-mini">
                             <nuxt-link
-                              :to="`/products/${product.product_id.slug}`"
+                              :to="`/products/${product.slug}`"
                               class="a-link-normal a-size-medium a-text-bold"
-                            >{{product.product_id.title}}</nuxt-link>
+                            >{{product.title}}</nuxt-link>
                             <!-- Product's Owner name -->
-                            <span class="a-size-base sc-product-creator">by {{product.product_id.user.name}}</span>
+                            <span class="a-size-base sc-product-creator">by {{product.user.name}}</span>
                           </div>
                           <div>
                             <span
                               class="a-size-small a-color-secondary sc-product-binding"
-                            >{{product.product_id.category}}</span>
+                            >{{product.category.name}}</span>
                           </div>
                           <div>
                             <span
                               class="a-size-small a-color-success sc-product-availability"
+                              v-if="product.stock > 0"
                             >In Stock</span>
+                            <span
+                              class="a-size-small a-color-danger sc-product-availability"
+                              v-else
+                            >Out of Stock</span>
                           </div>
                           <div class="a-checkbox a-align-top a-size-small a-spacing-top-micro">
                             <label>
@@ -64,9 +70,9 @@
                             </label>
                           </div>
                           <div class="sc-action-links">
-                            <select @change="onChangeQuantity($event, product.product_id)">
+                            <select @change="onChangeQuantity($event, product)">
                               <option
-                                v-for="i in 10"
+                                v-for="i in 20"
                                 :key="i"
                                 :value="i"
                                 :selected="checkQty(product.quantity, i)"
@@ -85,10 +91,12 @@
                         </div>
                         <div class="col-sm-2 col-2 tr sm-txt-r">
                           <!-- Product's Price -->
+                          
+                          <p>{{product.price}} - {{product.quantity}}</p>
                           <p class="a-spacing-small">
                             <span
                               class="a-size-medium a-color-price sc-price sc-white-space-nowrap sc-product-price sc-price-sign a-text-bold"
-                            >${{parseInt(product.product_id.price) * parseInt(product.quantity)}}</span>
+                            >${{product.price * product.quantity}}</span>
                           </p>
                         </div>
                       </div>
@@ -208,9 +216,9 @@ export default {
     ...mapGetters(['getCart', 'getCartTotalPrice', 'getCartLength'])
   },
   methods: {
-    onChangeQuantity(event, product) {
+    onChangeQuantity(event, id) {
       let qty = parseInt(event.target.value)
-      this.$store.commit('changeQty', { product, qty })
+      this.$store.commit('changeQty', { id, qty })
     },
     checkQty(prodQty, qty) {
       if (parseInt(prodQty) === parseInt(qty)) {

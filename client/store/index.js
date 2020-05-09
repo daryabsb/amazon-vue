@@ -1,7 +1,9 @@
 export const state = () => ({
     cart: [],
+    prodQty: [],
     cartLength: 0,
-    cartApi: []
+    cartProdApi: [],
+
 })
 
 export const actions = {
@@ -21,12 +23,12 @@ export const actions = {
     //     state.cart = []
     //     console.log(state.cart)
     //  },
-    addProductToCart({ state, commit }, product) {
+    addProductToCart({ state, commit }, id) {
         
-        const cartProduct = state.cart.find(prod => prod.id === product.id);
+        const cartProduct = state.cart.find(product_id => product_id.id === id);
 
         if (!cartProduct) {
-            commit("pushProductToCart", product);
+            commit("pushProductToCart", id);
         } else {
             commit("incrementProductQty", cartProduct)
         }
@@ -36,43 +38,65 @@ export const actions = {
 };
 
 export const mutations = {
-    getCartApiFilled(state, allCart) {
-        
-        // console.log(allCart.data[0].product_id)
-      
-    var i = 0;
-    var cl = 0;
-    for (i in allCart.data) {
-        // console.log(allCart.data[i].quantity)
-        state.cart.push(allCart.data[i])
-        state.cart[i].product_id.quantity = state.cart[i].quantity
-        cl += state.cart[i].quantity
-    }
-    state.cartLength = cl
-    // console.log(state.cart)
+    async getCartApiFilled(state, allCart) {
+
+    const [cartProductsResponse] = await Promise.all([
+        allCart.data
+        ])
+
        
-        
-        
+        cartProductsResponse.forEach(el => {
+            el.product_id.quantity = el.quantity;
+            el.product_id.ordered = el.ordered;
+            el.product_id.product = el.product;
+            state.cart.push(el.product_id);
+            // state.cart.push.push('quantity')
+            
+            state.cart.ordered = el.ordered;
+            state.cart.product = el.product;
+        });
+        state.cartLength = state.cart.length
+        // console.log(state.cartLength) 
     },
     
-    async pushProductToCart(state, product) {
+    async pushProductToCart(id, qty=1) {
         let data = {
-            "ordered": false,
-            "product": product.id,
-            "quantity": 1
+            "product": st,
+            "quantity": qty
         };
             // console.log(data)
         let productData = await this.$axios.post(
             'http://127.0.0.1:8000/api/order/carts/', data
         );
-        // console.log(product)
+        // console.log()
         // state.cart.push(product)
     },
 
-    incrementProductQty(state, product) {
-        product.quantity++;
-        let indexOfProduct = state.cart.indexOf(product);
-        state.cart.splice(indexOfProduct, 1, product)
+    async incrementProductQty(state, id) {
+        var qty = 0;
+        var i=[];
+        for (i in state.cart) {
+            if (state.cart[i].product_id.id === id.product_id.id) {
+                qty = state.cart[i].product_id.quantity
+            }
+            // console.log(state.cart[i].product_id.id === id.product_id.id)
+        }
+        
+        
+        console.log('The quantity is: ', qty)
+        // product.quantity++;
+        // let indexOfProduct = state.cart.indexOf(product);
+        // state.cart.splice(indexOfProduct, 1, product)
+        let data = {
+            "ordered": false,
+            "product": id.product_id.id,
+            "quantity": qty + 1
+        };
+            console.log(data)
+        let productData = await this.$axios.put(
+            'http://127.0.0.1:8000/api/order/carts/', data
+        );
+
     },
 
     incrementCartLength(state) {
@@ -89,8 +113,8 @@ export const mutations = {
     3. Update length of the cart
     4. Replace the old product with the updated product
     */
-    changeQty(state, { product, qty }) {
-        let cartProduct = state.cart.find(prod => prod.id === product.id);
+    changeQty(state, { id, qty }) {
+        let cartProduct = state.cart.find(prod => prod.id === id);
         cartProduct.quantity = qty;
 
         state.cartLength = 0;
@@ -120,16 +144,17 @@ export const getters = {
         return state.cartLength;
     },
     getCart(state) {
+        console.log(state.cart)
         return state.cart;
     },
     getCartTotalPrice(state) {
         let total = 0
-        // console.log(state.cart[0].product_id)
-        state.cart.map(product_id =>{
-            // console.log(product_id.product_id)
-            total += product_id.product_id.price * product_id.product_id.quantity ;
+        console.log(state.cart.price)
+        state.cart.map(product => {
+            total += parseInt(product.price) * parseInt(product.quantity);
+        })
         
-        });
+            console.log(total)
         
         return total;
     }
