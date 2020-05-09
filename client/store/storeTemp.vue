@@ -27,21 +27,22 @@ export const actions = {
   //     state.cart = []
   //     console.log(state.cart)
   //  },
-  addProductToCart({ state, commit }, product ) {
+  addProductToCart({ state, commit }, product, qty ) {
     //   console.log(product)
     const cartProduct = state.cart.find((prod) => prod.id === product.id);
 
     if (!cartProduct) {
-      commit("pushProductToCart", product);
+      commit("pushProductToCart", product, qty);
      
     } else {
-      // console.log(qty)
-      commit("incrementProductQty", cartProduct);
+      commit("incrementProductQty", qty);
     }
-    commit("getCartApiUpdate", product);
+    // commit("getCartApiFilled");
 
+    commit("updateCart", product);
+    commit("incrementCartLength", qty)
     
-    // commit("incrementCartLength");
+    commit("updateCartLength", qty=1);
   },
 };
 
@@ -53,7 +54,6 @@ export const mutations = {
       el.product_id.quantity = el.quantity;
       el.product_id.ordered = el.ordered;
       el.product_id.product = el.product;
-      el.product_id.cartId = el.id;
       state.cart.push(el.product_id);
       // state.cart.push.push('quantity')
 
@@ -63,32 +63,14 @@ export const mutations = {
     state.cartLength = state.cart.length;
     // console.log(state.cartLength)
   },
-  getCartApiUpdate(state, product) {
 
-    state.cart.push(product)
-    // const [cartProductResponse] = await Promise.all([product]);
-
-    // cartProductsResponse.forEach((el) => {
-    //   el.product_id.quantity = el.quantity;
-    //   el.product_id.ordered = el.ordered;
-    //   el.product_id.product = el.product;
-    //   state.cart.push(el.product_id);
-    //   // state.cart.push.push('quantity')
-
-    //   state.cart.ordered = el.ordered;
-    //   state.cart.product = el.product;
-    // });
-    state.cartLength = state.cart.length;
-    // console.log(state.cart)
-  },
-
-  async pushProductToCart(state, {product, qty}) {
+  async pushProductToCart(state, product, qty=1) {
     try {
       let data = {
         product: product.id,
         quantity: qty,
       };
-      // console.log(data)
+      console.log(data)
       let productData = await this.$axios.post(
         "http://127.0.0.1:8000/api/order/carts/",
         data
@@ -104,18 +86,22 @@ export const mutations = {
     // state.cart.push(product)
   },
 
-  async incrementProductQty(state, prod) {
-    const newQty = parseInt(prod.quantity) + 1;
-    console.log(newQty)
+  updateCart(state,product) {
+    state.cart.push(product);
+  },
+  updateCartLength(state, qty) {
+    state.cart.cartLength += qty;
+  },
+
+  async incrementProductQty(prod, qty) {
     try {
-      console.log(state.cart)
       let data = {
         product: prod.id,
-        quantity: prod.quantity + 1
+        quantity: qty,
       };
-      console.log(data)
-      await this.$axios.put(
-        `http://127.0.0.1:8000/api/order/carts/${prod.cartId}/`,
+
+      let productResponse = await this.$axios.put(
+        "http://127.0.0.1:8000/api/order/carts/",
         data
       );
     } catch (err) {
@@ -123,7 +109,7 @@ export const mutations = {
     }
   },
 
-  incrementCartLength(state) {
+  incrementCartLength(state, qty) {
       state.cartLength = 0;
       if (state.cart.length > 0) {
           state.cart.map(product => {
@@ -174,8 +160,7 @@ export const getters = {
   getCartTotalPrice(state) {
     let total = 0;
     // console.log(state.cart.price);
-    state.cart.map(product => {
-        // console.log(product);
+    state.cart.map((product) => {
       total += parseInt(product.price) * parseInt(product.quantity);
     });
 

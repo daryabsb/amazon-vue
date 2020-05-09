@@ -223,6 +223,8 @@ class Cart(models.Model):
     date_added = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    unique_together = [['user', 'product']]
+
     def __str__(self):
         return f"{self.quantity} of {self.product}"
 

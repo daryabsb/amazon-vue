@@ -1,6 +1,8 @@
 
 from rest_framework.viewsets import ModelViewSet
 
+from rest_framework.exceptions import ValidationError
+
 from rest_framework.authentication import TokenAuthentication
 
 from orders.serializers import CartSerializer, OrderSerializer, ShipmentSerializer
@@ -22,8 +24,17 @@ class CartViewset(ModelViewSet):
         """Return objects for the current authenticated user only"""
         return self.queryset.filter(user=self.request.user).order_by('-date_added')
 
+    # def perform_create(self, serializer):
+    #     """Create a new object"""
+    #     serializer.save(user=self.request.user)
+
     def perform_create(self, serializer):
-        """Create a new object"""
+
+        queryset = Cart.objects.filter(
+            user=self.request.user,
+            product=self.request.data['product'])
+        if queryset.exists():
+            raise ValidationError('You have already added this product')
         serializer.save(user=self.request.user)
 
 
@@ -41,11 +52,12 @@ class OrderViewset(ModelViewSet):
 
     def perform_create(self, serializer):
         """Create a new object"""
-        
+
         serializer.save(user=self.request.user)
 
+
 class ShipmentViewset(ModelViewSet):
-#     """Base viewset for user owned recipe attributes"""
+    #     """Base viewset for user owned recipe attributes"""
     queryset = Shipment.objects.all()
     serializer_class = ShipmentSerializer
 
@@ -58,5 +70,5 @@ class ShipmentViewset(ModelViewSet):
 
     def perform_create(self, serializer):
         """Create a new object"""
-        
+
         serializer.save(user=self.request.user)

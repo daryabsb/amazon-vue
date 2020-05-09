@@ -224,10 +224,10 @@
                   <div class="row">
                     <div class="col-sm-5 col-5">
                       <select>
-                        <option v-for="i in 20"
+                        <option
+                                v-for="i in product.stock"
                                 :key="i"
                                 :value="i"
-                                :selected="i"
                               >Qty: &nbsp;{{i}}</option>
                       </select>
                     </div>
@@ -247,7 +247,7 @@
                 </div>
 
                 <div class="a-section">
-                  <div class="a-button-stack" @click="addProductToCart(product.id, i)" >
+                  <div class="a-button-stack" @click="addProductToCart(product, 5)" >
                     <span class="a-spacing-small a-button-primary a-button-icon">
                       <span class="a-button-inner">
                         <i class="a-icon a-icon-cart"></i>
@@ -354,6 +354,7 @@
 
 <script>
 import {mapActions} from 'vuex';
+import { mapGetters } from 'vuex'
 import ReviewSection from '~/components/ReviewSection';
  const base = 'http://127.0.0.1:8000/api';
 
@@ -398,6 +399,9 @@ export default {
     },
   
     ...mapActions(['addProductToCart'])
-  }
+  },
+  // computed: {
+  //   ...mapGetters(['getCart', 'getCartTotalPrice', 'getCartLength'])
+  // }
 }
 </script>
