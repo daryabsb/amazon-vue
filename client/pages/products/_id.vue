@@ -223,9 +223,9 @@
                 <div class="a-section a-spacing-none">
                   <div class="row">
                     <div class="col-sm-5 col-5">
-                      <select>
+                      <select v-model="i">
                         <option
-                                v-for="i in product.stock"
+                                v-for="i in 20"
                                 :key="i"
                                 :value="i"
                               >Qty: &nbsp;{{i}}</option>
@@ -245,9 +245,8 @@
                   </div>
                   <div class="a-section a-spacing-mini">Shipts from and sold by Amazon.com</div>
                 </div>
-
                 <div class="a-section">
-                  <div class="a-button-stack" @click="addProductToCart(product, 5)" >
+                  <div class="a-button-stack" @click="addProductToCart({prod:product, qty: i})" >
                     <span class="a-spacing-small a-button-primary a-button-icon">
                       <span class="a-button-inner">
                         <i class="a-icon a-icon-cart"></i>
