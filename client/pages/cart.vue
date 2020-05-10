@@ -18,8 +18,7 @@
                 </div>
                 <!-- List of the item -->
                 <div class="sc-list-body" v-for="product in getCart" :key="product.id">
-                  <div class="sc-list-item-border"
-                  v-if="!product.ordered">
+                  <div class="sc-list-item-border" v-if="!product.ordered">
                     <div class="a-row a-spacing-top-base a-spacing-base">
                       <div class="row">
                         <!-- Product's Image -->
@@ -29,9 +28,7 @@
                           </a>
                         </div>
                         <div class="col-sm-8 col-8">
-                          <div>
-                  
-                          </div>
+                          <div></div>
                           <!-- Product's Title -->
                           <div class="a-spacing-mini">
                             <nuxt-link
@@ -83,7 +80,10 @@
                             &nbsp;
                             <!-- Delete button -->
                             <span class="a-size-small">
-                              <a href="#" @click="$store.commit('removeProduct', product, product.cartId)">Delete</a>
+                              <a
+                                href="#"
+                                @click="$store.commit('removeProduct', product, product.cartId)"
+                              >Delete</a>
                             </span>
                             &nbsp;
                             &nbsp;
@@ -91,7 +91,7 @@
                         </div>
                         <div class="col-sm-2 col-2 tr sm-txt-r">
                           <!-- Product's Price -->
-                          
+
                           <p>{{product.price}} - {{product.quantity}}</p>
                           <p class="a-spacing-small">
                             <span
@@ -210,15 +210,24 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 export default {
   computed: {
     ...mapGetters(['getCart', 'getCartTotalPrice', 'getCartLength'])
   },
+  data() {
+    return {
+      i: 1
+    }
+  },
   methods: {
-    onChangeQuantity(event, id) {
+    onChangeQuantity(event, product) {
       let qty = parseInt(event.target.value)
-      this.$store.commit('changeQty', { id, qty })
+      this.$store.dispatch('changeQuantity', {
+        id: product.id,
+        qty: qty
+      });
+      // this.$store.commit('changeQty', { product, qty })
     },
     checkQty(prodQty, qty) {
       if (parseInt(prodQty) === parseInt(qty)) {
@@ -226,7 +235,8 @@ export default {
       } else {
         return false
       }
-    }
+    },
+    ...mapActions(['changeQuantity'])
   }
 }
 </script>

@@ -69,6 +69,32 @@ export const actions = {
     }
     
   },
+  async changeQuantity({ state, commit }, { id, qty }) {
+    //   console.log(id, qty)
+    let cartProduct = state.cart.find(prod => prod.id === id);
+    if (cartProduct){
+        var prodCartId = cartProduct.cartId;
+    }
+    
+      try {
+        let data = {
+          product: id,
+          quantity: qty,
+        };
+        // console.log(data)
+        let prodRes = await this.$axios.put(
+          `http://127.0.0.1:8000/api/order/carts/${prodCartId}/`,
+          data
+        );
+            // console.log(prodRes)
+        commit("incrementProductQty", prodRes);
+        commit("incrementCartLength");
+    } catch (err) {
+        console.log(err);
+      }
+
+    }
+
 };
 
 export const mutations = {
@@ -156,31 +182,27 @@ export const mutations = {
       3. Update length of the cart
       4. Replace the old product with the updated product
       */
-  changeQty(state, { product, qty }) {
-    let cartProduct = state.cart.find((prod) => prod.id === product.id);
-    cartProduct.quantity = qty;
+//   changeQty(state, { product, qty }) {
+//     let cartProduct = state.cart.find(prod => prod.id === product.id);
+//     cartProduct.quantity = qty;
 
-    state.cartLength = 0;
-    if (state.cart.length > 0) {
-      state.cart.map((product) => {
-        state.cartLength += product.quantity;
-      });
-    }
+//     console.log(cartProduct)
 
-    let indexOfProduct = state.cart.indexOf(cartProduct);
-    state.cart.splice(indexOfProduct, 1, cartProduct);
-  },
-  /*
-      1. remove the product quantity from the cartLength
-      get the index of the product that we delete
-      3. remove that product by using splice
-      */
+    // state.cartLength = 0;
+    // if (state.cart.length > 0) {
+    //   state.cart.map((product) => {
+    //     state.cartLength += product.quantity;
+    //   });
+    // }
+
+    // let indexOfProduct = state.cart.indexOf(cartProduct);
+    // state.cart.splice(indexOfProduct, 1, cartProduct);
+//   },
   async removeProduct(state, product, cartId) {
     try {
       state.cartLength -= product.quantity;
       let indexOfProduct = state.cart.indexOf(product);
       state.cart.splice(indexOfProduct, 1);
-    //   console.log(product.cartId);
 
       await this.$axios.delete(
         `http://127.0.0.1:8000/api/order/carts/${product.cartId}/`
