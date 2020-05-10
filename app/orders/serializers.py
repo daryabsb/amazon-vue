@@ -32,20 +32,20 @@ class CartSerializer(serializers.ModelSerializer):
         read_only_Fields = ('id', 'ordered', 'product',)
         # depth = 1
 
-    def create(self, validated_data):
-        cart = Cart(
-            user=validated_data['user'],
-            product=validated_data['product'],
-            quantity=validated_data['quantity']
-        )
-        cart.save()
-        return cart
+    # def create(self, validated_data):
+    #     cart = Cart(
+    #         user=validated_data['user'],
+    #         product=validated_data['product'],
+    #         quantity=validated_data['quantity']
+    #     )
+    #     cart.save()
+    #     return cart
 
-    def update(self, instance, validated_data):
-        instance.quantity = validated_data.get(
-            'quantity', instance.quantity
-        )
-        return instance
+    # def update(self, instance, validated_data):
+    #     instance.quantity = validated_data.get(
+    #         'quantity', instance.quantity
+    #     )
+    #     return instance
 
     # def update(self, instance, validated_data):
     #     # Update a user, setting the password correctly and return it

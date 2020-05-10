@@ -83,7 +83,7 @@
                             &nbsp;
                             <!-- Delete button -->
                             <span class="a-size-small">
-                              <a href="#" @click="$store.commit('removeProduct', product)">Delete</a>
+                              <a href="#" @click="$store.commit('removeProduct', product, product.cartId)">Delete</a>
                             </span>
                             &nbsp;
                             &nbsp;
