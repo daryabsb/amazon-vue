@@ -1,94 +1,103 @@
 export const state = () => ({
   cart: [],
-  prodQty: [],
   cartLength: 0,
-  cartProdApi: [],
 });
 
 export const actions = {
   async nuxtServerInit({ state, commit }) {
+
     try {
+
       const allCart = await this.$axios.get(
         "http://127.0.0.1:8000/api/order/carts/"
       );
-      //    console.log(allCart.data)
-      // if(state.cartApi){
+      
       commit("getCartApiFilled", allCart);
+      
+
     } catch (err) {
       console.log(err);
     }
-
-    // } else {
-    // console.log('What the hell!')
-    // }
+    
   },
-
-  // nuxtServerInit({state, commit}, {req}) {
-  //     state.cart = []
-  //     console.log(state.cart)
-  //  },
+  
   async addProductToCart({ state, commit }, { prod, qty }) {
-    //   console.log(qty)
-    const cartProduct = state.cart.find((product) => product.id === prod.id);
-
-    if (!cartProduct) {
-
-        try {
-            let data = {
-              product: prod.id,
-              quantity: qty,
-            };
-            // console.log(data)
-            let prodRes = await this.$axios.post(
-              "http://127.0.0.1:8000/api/order/carts/",
-              data
-            );
-            
-            commit("getCartApiUpdate", prodRes);
-            commit('incrementCartLength')
-        
-            //
-          } catch (err) {
-            console.log(err);
-          }
-
-
-
-    //   commit("pushProductToCart", { product: prod, qty: qty });
-    //   console.log(addedItem)
-    } else {
-      commit("incrementProductQty", prod, qty);
-
-     
       
-      commit("getCartApiUpdate", prodRes);
-    }
+    const cartProduct = state.cart.find((product) => product.id === prod.id);
+    
+    
+    if (!cartProduct) {
+      try {
 
-    // commit("getCartApiUpdate", prodRes);
-    // commit("incrementCartLength");
+        let data = {
+          product: prod.id,
+          quantity: qty,
+        };
+
+        let prodRes = await this.$axios.post(
+          "http://127.0.0.1:8000/api/order/carts/",
+          data
+        );
+
+        commit("getCartApiUpdate", prodRes);
+        commit("incrementCartLength");
+
+      } catch (err) {
+        console.log(err);
+      }
+
+    } else {
+        var prodCartId = cartProduct.cartId;
+        var prodQuantity = cartProduct.quantity
+
+      try {
+        let data = {
+          product: prod.id,
+          quantity: parseInt(prodQuantity) + parseInt(qty),
+        };
+        let prodRes = await this.$axios.put(
+          `http://127.0.0.1:8000/api/order/carts/${prodCartId}/`,
+          data
+        );
+
+        commit("incrementProductQty", prodRes);
+        commit("incrementCartLength");
+        
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    
   },
 };
 
 export const mutations = {
   async getCartApiFilled(state, allCart) {
+
     const [cartProductsResponse] = await Promise.all([allCart.data]);
 
     cartProductsResponse.forEach((el) => {
+
       el.product_id.quantity = el.quantity;
       el.product_id.ordered = el.ordered;
       el.product_id.product = el.product;
       el.product_id.cartId = el.id;
       state.cart.push(el.product_id);
-      // state.cart.push.push('quantity')
-
+      
       state.cart.ordered = el.ordered;
       state.cart.product = el.product;
     });
-    state.cartLength = state.cart.length;
-    // console.log(state.cartLength)
+    state.cartLength = 0;
+    if (state.cart.length > 0) {
+      state.cart.map((p) => {
+        state.cartLength += p.quantity;
+      });
+    }
+    
+    
   },
   getCartApiUpdate(state, prodRes) {
-    // console.log(prodRes.data)
+      
     var prod = prodRes.data.product_id;
 
     prod.quantity = prodRes.data.quantity;
@@ -97,56 +106,40 @@ export const mutations = {
     prod.cartId = prodRes.data.id;
     prod.dateAdded = prodRes.data.date_added;
     state.cart.unshift(prod);
-
-    console.log(state.cart)
+    
     state.cartLength = state.cart.length;
   },
 
-  async pushProductToCart(state, prodRes) {
+//   async pushProductToCart(state, prodRes) {
+    // prodRes.data.product_id.cartId = prodRes.data.id;
+    // prodRes.data.product_id.quantity = qty;
+    // prodRes.data.product_id.ordered = prodRes.data.quantity;
+    // prodRes.data.product_id.totalPrice = prodRes.data.total_item_price;
+    // prodRes.data.product_id.dateAdded = prodRes.data.date_added;
 
-
-    
-    prodRes.data.product_id.cartId = prodRes.data.id;
-    prodRes.data.product_id.quantity = qty;
-    prodRes.data.product_id.ordered = prodRes.data.quantity;
-    prodRes.data.product_id.totalPrice = prodRes.data.total_item_price;
-    prodRes.data.product_id.dateAdded = prodRes.data.date_added;
-
-    state.cart.unshift(prodRes.data.product_id);
+    // state.cart.unshift(prodRes.data.product_id);
     // console.log()
     // state.cart.push(product)
-  },
+//   },
 
-  async incrementProductQty(state, prod, qty) {
-    let indexOfProduct = state.cart.indexOf(prod);
-    state.cart.splice(indexOfProduct, 1);
+  async incrementProductQty(state, prodRes) {
+      
+    const prodForQtyUpdate = state.cart.find((p) => 
+        p.id === prodRes.data.product
+        );
 
-    try {
-      let cartResponse = await this.$axios.get(
-        "http://127.0.0.1:8000/api/order/carts/"
-      );
+        prodForQtyUpdate.cartId = prodRes.data.id
+        prodForQtyUpdate.quantity = prodRes.data.quantity;
+        prodForQtyUpdate.dateAdded = prodRes.data.date_added;
+        prodForQtyUpdate.totalItemPrice = prodRes.data.total_item_price;
+        prodForQtyUpdate.product = prodRes.data.product;
+        prodForQtyUpdate.ordered = prodRes.data.ordered;
 
-      const [cartItems] = await Promise.all([cartResponse.data]);
-      // console.log(qty)
-
-      cartItems.forEach((el) => {
-        // console.log(el.quantity)
-        prod.cartId = el.id;
-        prod.quantity = el.quantity;
-      });
-      // console.log(state.cart)
-      let data = {
-        product: prod.id,
-        quantity: prod.quantity + parseInt(qty),
-      };
-      // console.log(data)
-      await this.$axios.put(
-        `http://127.0.0.1:8000/api/order/carts/${prod.cartId}/`,
-        data
-      );
-    } catch (err) {
-      console.log(err);
-    }
+        let indexOfProduct = state.cart.indexOf(prodForQtyUpdate);
+        state.cart.splice(indexOfProduct, 1, prodForQtyUpdate);
+        
+        // prodForQtyUpdate.quantity = prodRes.data.quantity;
+    
   },
 
   incrementCartLength(state) {
@@ -187,7 +180,7 @@ export const mutations = {
       state.cartLength -= product.quantity;
       let indexOfProduct = state.cart.indexOf(product);
       state.cart.splice(indexOfProduct, 1);
-      console.log(product.cartId);
+    //   console.log(product.cartId);
 
       await this.$axios.delete(
         `http://127.0.0.1:8000/api/order/carts/${product.cartId}/`
@@ -195,10 +188,6 @@ export const mutations = {
     } catch (err) {
       console.log(err);
     }
-
-    // state.cartLength -= product.quantity;
-    // let indexOfProduct = state.cart.indexOf(product);
-    // state.cart.splice(indexOfProduct, 1);
   },
 };
 
@@ -207,18 +196,13 @@ export const getters = {
     return state.cartLength;
   },
   getCart(state) {
-    // console.log(state.cart);
     return state.cart;
   },
   getCartTotalPrice(state) {
     let total = 0;
-    // console.log(state.cart.price);
     state.cart.map((product) => {
-      // console.log(product);
       total += parseInt(product.price) * parseInt(product.quantity);
     });
-
-    // console.log(total);
 
     return total;
   },
