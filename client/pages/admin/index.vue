@@ -6,8 +6,17 @@
     </h3> -->
     <div class="container-fluid browsing-history">
       <div class="row">
+        <div class="col-md-12 col-sm-8 col-8">
+    <profile />
+        </div>
+      </div>
+    </div>
+    <div class="container-fluid browsing-history"
+    v-if="$auth.user.is_supplier"
+    >
+      <div class="row">
         <div class="col-sm-8 col-8">
-          <h1 class="a-size-large a-spacing-none a-text-normal">All Products</h1>
+          <h1 class="a-size-large a-spacing-none a-text-normal">All My Products</h1>
           <div class="a-spacing-large"></div>
           <!-- Button -->
           <nuxt-link to="/products" class="a-button-buy-again">Add a new product</nuxt-link>
@@ -70,6 +79,7 @@
 </template>
 
 <script>
+import profile from '~/components/profile.vue';
 export default {
   // asyncData is fetching data before nuxt page finished loading on the browser
   // It is good for SEO because the data will be loaded first
@@ -89,6 +99,9 @@ export default {
     }
     
     
+  },
+  components: {
+    profile
   },
   methods: {
     async onDeleteProduct(id, index) {

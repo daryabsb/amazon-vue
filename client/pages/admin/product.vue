@@ -23,7 +23,7 @@
               <!-- Category Tags -->
               <div class="a-spacing-top-medium">
                 <label for>Tags</label>
-                <select class="a-select-option" v-model="tagID">
+                <select class="a-select-option">
                   <option 
                   v-for="tag in tags" 
                   :key="tag.id" 
@@ -34,11 +34,6 @@
               <div class="a-spacing-top-medium">
                 <label style="margin-bottom: 8px;" for="title">Title</label>
                 <input type="text" class="a-input-text" style="width: 100%;" v-model="productTitle" />
-              </div>
-              <!-- Description Text -->
-              <div class="a-spacing-top-medium">
-                <label style="margin-bottom: 8px;" for="description">Description</label>
-                <textarea type="text" rows="25" class="a-input-text" style="width: 100%;" v-model="productDescription"></textarea>
               </div>
               <!-- Stock Text -->
               <div class="a-spacing-top-medium">
@@ -60,16 +55,6 @@
                   v-model="productPrice"
                 />
               </div>
-              <!-- Featured Label -->
-                <div class="a-spacing-top-medium">
-                  <label for="ap_customer-supplier" class="a-form-label">Label as featured product:</label>
-                  <input
-                    type="checkbox"
-                    id="ap_featured_product"
-                    class="a-checkbox-label a-radio-label"
-                    v-model="productFeatured"
-                  />
-                </div>
               <!-- Photo file -->
               <div class="a-spacing-top-medium">
                 <label style="margin-bottom: 8px;" for="price">Image</label>
@@ -123,12 +108,10 @@ export default {
   data() {
     return {
       categoryID: null,
-      tagID: [],
-      productTitle: '',
-      productDescription: '',
+      tagID: [1],
+      productTitle: null,
       productStock: 1,
-      productPrice: null,
-      productFeatured: false,
+      productPrice: 0,
       selectedFile: null,
       fileName: ''
     }
@@ -141,23 +124,19 @@ export default {
       //   console.log(this.fileName);
     },
     async onAddProduct() {
-      // console.log('tags', this.tagID)
-      
-      // console.log(this.tagID)
-      try {
-        let formData = new FormData()
-        formData.append("title", this.productTitle);
-        formData.append("description", this.productDescription);
-        formData.append('category', this.categoryID);
-        formData.append("tags", this.tagID);
-        formData.append("featured", this.productFeatured);
-        formData.append("stock", this.productStock);
-        formData.append("price", this.productPrice);
-        formData.append("image", this.selectedFile, this.fileName);
+      console.log('tags', this.tagID)
+      let formData = new FormData()
+      formData.append('category', this.categoryID)
+      formData.append('tags', this.tagID[0]),
+      formData.append('title', this.productTitle),
+      formData.append('stock', this.productStock)
+      formData.append('price', this.productPrice)
+      formData.append('image', this.selectedFile, this.fileName)
 
-        // console.log(formData)
+      
+      try {
         let result = await this.$axios.$post('/product/products/', formData)
-        // console.log(result)
+        console.log(formData)
         // console.log("SUCCESS");
         this.$router.push('/')
       } catch (err) {

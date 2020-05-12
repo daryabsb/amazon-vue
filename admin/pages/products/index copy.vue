@@ -11,42 +11,34 @@
               <!-- Category Dropdown -->
               <div class="a-spacing-top-medium">
                 <label for>Category</label>
-                <select class="a-select-option">
+                <select class="a-select-option" v-model="categoryID">
                   <option
                     v-for="category in categories"
                     :key="category.id"
                     :value="category.id"
-                    :selected="selectedCategory(category.id)"
+                    
                   >{{category.name}}</option>
                 </select>
               </div>
               <!-- Category Tags -->
               <div class="a-spacing-top-medium">
                 <label for>Tags</label>
-                <select class="a-select-option">
-                  <option
-                  desabled 
-                  v-for="tag in tags"
+                <select class="a-select-option" v-model="tagID">
+                  <option 
+                  v-for="tag in tags" 
                   :key="tag.id" 
-                  :value="tag.id"
-                  :selected="selectedTag(tag.id)"
-                  >{{tag.name}}</option>
+                  :value="tag.id">{{tag.name}}</option>
                 </select>
               </div>
               <!-- Titel Text -->
               <div class="a-spacing-top-medium">
                 <label style="margin-bottom: 8px;" for="title">Title</label>
-                <input type="text" class="a-input-text" style="width: 100%;" v-model="productTitle" :placeholder="product.title" />
+                <input type="text" class="a-input-text" style="width: 100%;" v-model="productTitle" />
               </div>
               <!-- Description Text -->
               <div class="a-spacing-top-medium">
                 <label style="margin-bottom: 8px;" for="description">Description</label>
-                <textarea type="text" 
-                rows="25" class="a-input-text" 
-                style="width: 100%;" 
-                v-model="productDescription"
-                :placeholder="product.description"
-                ></textarea>
+                <textarea type="text" rows="25" class="a-input-text" style="width: 100%;" v-model="productDescription"></textarea>
               </div>
               <!-- Stock Text -->
               <div class="a-spacing-top-medium">
@@ -56,7 +48,6 @@
                   class="a-input-text"
                   style="width: 100%;"
                   v-model="productStock"
-                  :placeholder="product.stock"
                 />
               </div>
               <!-- Price Text -->
@@ -67,7 +58,6 @@
                   class="a-input-text"
                   style="width: 100%;"
                   v-model="productPrice"
-                  :placeholder="product.price"
                 />
               </div>
               <!-- Featured Label -->
@@ -90,31 +80,12 @@
                     <p style="margin-top: -70px;">{{ fileName }}</p>
                   </label>
                 </div>
-              </div>
-              <hr />
-              <div class="row">
-                
-                <!-- Update Button -->
-                <div class="col-sm-3 col-3">
+                <hr />
+                <!-- Button -->
+                <div class="a-spacing-top-large">
                   <span class="a-button-register">
                     <span class="a-button-inner">
-                      <span class="a-button-text" @click="onUpdateProduct">Update Product</span>
-                    </span>
-                  </span>
-                </div>
-                <!-- Delete Button -->
-                <div class="col-sm-3 col-3">
-                  <span class="a-button-register">
-                    <span class="a-button-inner">
-                      <span class="a-button-text" @click="onDeleteProduct">Delete Product</span>
-                    </span>
-                  </span>
-                </div>
-                 <!-- Home Button -->
-                <div class="col-sm-3 col-3">
-                  <span class="a-button-register">
-                    <span class="a-button-inner">
-                      <a href="/" class="a-button-text">Backe to Home</a>
+                      <span class="a-button-text" @click="onAddProduct">Add Product</span>
                     </span>
                   </span>
                 </div>
@@ -129,39 +100,34 @@
 </template>
 
 <script>
-var product = [];
+import Multiselect from 'vue-multiselect';
 export default {
-  
-  async asyncData({ $axios, params }) {
+  async asyncData({ $axios }) {
     try {
       let categories = $axios.$get('/product/categories/')
       let tags = $axios.$get('/product/tags/')
-      product = $axios.$get(`/product/products/${ params.id }`)
 
-      const [catResponse, tagResponse, productResponse] = await Promise.all([categories, tags, product])
+      const [catResponse, tagResponse] = await Promise.all([categories, tags])
 
       // console.log(catResponse);
       // console.log(tagResponse);
-      // console.log(productResponse);
 
       return {
         categories: catResponse,
-        tags: tagResponse,
-        product: productResponse
+        tags: tagResponse
       }
     } catch (err) {
       console.log(err)
       console.log('Please check that your api server is running!')
     }
-
   },
   data() {
     return {
-      categoryID: '',
+      categoryID: null,
       tagID: [],
       productTitle: '',
       productDescription: '',
-      productStock: product.stock,
+      productStock: 1,
       productPrice: null,
       productFeatured: false,
       selectedFile: null,
@@ -175,25 +141,12 @@ export default {
       this.fileName = event.target.files[0].name
       //   console.log(this.fileName);
     },
-    async onUpdateProduct() {
+    async onAddProduct() {
+      // console.log('tags', this.tagID)
       
-      
-      // console.log('tags', this.tagID);
-      const id = this.product.slug;
+      // console.log(this.tagID)
       try {
-      console.log({
-        'product': this.productDetail,
-        "title": this.productTitle,
-        "description": this.productDescription,
-        'category': this.categoryID,
-        "tags": this.tagID,
-        "featured": this.productFeatured,
-        "stock": this.productStock,
-        "price": this.productPrice,
-        "image": (this.selectedFile, this.fileName)
-        });
-
-     let formData = new FormData()
+        let formData = new FormData()
         formData.append("title", this.productTitle);
         formData.append("description", this.productDescription);
         formData.append('category', this.categoryID);
@@ -203,36 +156,15 @@ export default {
         formData.append("price", this.productPrice);
         formData.append("image", this.selectedFile, this.fileName);
 
-        
-      
-      
-        let result = await this.$axios.$put(`/product/products/${ id }/`, formData)
-        console.log("SUCCESS");
+        // console.log(formData)
+        let result = await this.$axios.$post('/product/products/', formData)
+        // console.log(result)
+        // console.log("SUCCESS");
         this.$router.push('/')
       } catch (err) {
         console.log('Cannot access the api!')
         console.log(err)
       }
-    },
-    async onDeleteProduct() {
-      // console.log('tags', this.tagID);
-      const id = this.product.id;
-      try {
-        let result = await this.$axios.$delete(`/product/products/${ id }/`)
-        console.log("SUCCESS");
-        this.$router.push('/')
-      } catch (err) {
-        console.log('Cannot access the api!')
-        console.log(err)
-      }
-    },
-    selectedCategory (catID) {
-      // `this` points to the vm instance
-      return this.categoryID = catID
-    },
-    selectedTag (tid) {
-      // `this` points to the vm instance
-      return this.tagID = tid
     }
   }
 }

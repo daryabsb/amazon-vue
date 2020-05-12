@@ -111,14 +111,18 @@ class MyProductViewset(viewsets.ModelViewSet):
     def get_serializer_class(self):
         # return apropriate serializer class
         if self.action == 'retrieve':
-            return serializers.MyProductSerializer
+            return serializers.ProductDetailSerializer
         elif self.action == 'upload_image':
             return serializers.ProductImageSerializer
 
         return self.serializer_class
 
+    # def get_queryset(self):
+    #         return Product.objects.filter(user=self.request.user)
+
     def perform_create(self, serializer):
         """Create a new product"""
+        # print(self.request.data)
         serializer.save(user=self.request.user)
 
     @action(methods=['POST'], detail=True, url_path='upload-image')

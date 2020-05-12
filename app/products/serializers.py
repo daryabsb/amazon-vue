@@ -54,15 +54,15 @@ class MyProductSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'description', 'category', 'tags', 'featured', 'stock',
                   'price', 'slug', 'user', 'image', 'reviews_count'
                   )
-        read_only_Fields = ('id', 'user')
+        read_only_Fields = ('id',)
 
     def get_reviews_count(self, instance):
         return instance.reviews.count()
 
-# class ProductDetailSerializer(ProductSerializer):
-#     # Serializer a recipe detail
-#     tags = TagSerializer(many=True, read_only=True)
-#     reviews = ReviewSerializer(many=True)
+class ProductDetailSerializer(MyProductSerializer):
+    # Serializer a recipe detail
+    tags = TagSerializer(many=True, read_only=True)
+    category = CategorySerializer(read_only=True)
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
@@ -71,5 +71,5 @@ class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ('id', 'image')
-        read_only_Fields = ('id',)
+        read_only_Fields = ('id','slug',)
         

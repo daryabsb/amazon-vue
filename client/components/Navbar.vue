@@ -70,7 +70,7 @@
               <span class="icp-nav-link-border"></span>
               <template v-if="$auth.loggedIn">
                 <nuxt-link
-                  to="/profile"
+                  to="/admin"
                   class="nav-a nav-a-2"
                   id="nav-link-accountlist"
                   tabindex="0"
