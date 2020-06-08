@@ -1,7 +1,7 @@
 <template>
   <div>
     <header class="nav-opt-sprite nav-locate-us nav-lang-en nav-ssl nav-unrec">
-      <div class="container-fluid dekstop-nav">
+      <div class="container-fluid">
         <div class="row">
           <!-- Logo -->
           <div class="col-sm-2">
@@ -109,13 +109,14 @@
           </div>
         </div>
       </div>
+      
     </header>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
-import Search from '~/components/Search'
+import Search from '~/components/Search';
 export default {
   components: {
     Search

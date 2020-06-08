@@ -2177,6 +2177,10 @@ a.kicsPopover span {
 .a-button-dropdown .a-button-inner{
     height: 20px;
 }
+.a-button.a-button-small.a-button-dropdown .a-icon-dropdown {
+    right: 5px;
+  }
+  
 .a-button-dropdown:hover {
     border-color: #a2a6ac #979aa1 #82858a;
 }

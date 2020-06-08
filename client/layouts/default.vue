@@ -1,6 +1,7 @@
 <template>
   <div>
     <Navbar />
+    <FilterResultBar />
     <nuxt />
     <Footer />
   </div>
@@ -9,9 +10,12 @@
 <script>
 import Navbar from "~/components/Navbar";
 import Footer from "~/components/Footer";
+import FilterResultBar from "~/components/FilterResultBar";
+
 export default {
   components: {
     Navbar,
+    FilterResultBar,
     Footer
   }
 }
